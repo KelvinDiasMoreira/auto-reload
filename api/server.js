@@ -6,7 +6,7 @@ const port = 3000;
 
 const server = createServer((req, res) => {
   if (req.url === "/") {
-    readFile("../index.html", (err, content) => {
+    readFile("./index.html", (err, content) => {
       if (err) {
         setNotFoundStatusCode(res);
       } else {
@@ -15,7 +15,7 @@ const server = createServer((req, res) => {
       }
     });
   } else if (req.url === "/src/main.js") {
-    readFile("../src/main.js", (err, content) => {
+    readFile("./src/main.js", (err, content) => {
       if (err) {
         setNotFoundStatusCode(res);
       } else {

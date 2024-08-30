@@ -1,31 +1,13 @@
 import { fork } from "node:child_process";
+import { manageProccess } from "./manageProccess.js";
 const files = ["./api/server.js", "./src/monitor.js"];
-const mainPid = process.pid;
-
-const manageProccess = () => {
-  let processes = [];
-
-  const updateListProccesses = (procces) => {
-    processes.push(procces);
-  };
-
-  const countProccesses = () => {
-    return processes.length;
-  };
-
-  return {
-    updateListProccesses,
-    countProccesses,
-    processes,
-  };
-};
 
 const loopProcesses = () => {
   const proccesManager = manageProccess();
 
   for (let i = 0; i < files.length; i++) {
     const process = fork(files[i]);
-    proccesManager.updateListProccesses(process);
+    proccesManager.addProccesToArray(process);
   }
 
   for (let i = 0; i < proccesManager.processes.length; i++) {
@@ -35,23 +17,29 @@ const loopProcesses = () => {
       );
     });
     proccesManager.processes[i].on("message", (message) => {
-      if (message?.event) {
+      if (message && message?.event === "change") {
         for (let j = 0; j < proccesManager.processes.length; j++) {
-          console.log(
-            `killing proccess with pid: ${proccesManager.processes[j].pid}...`
-          );
+          if (
+            !proccesManager.findProccessByPid(proccesManager.processes[j].pid)
+          )
+            continue;
+
           proccesManager.processes[j].kill();
-          proccesManager.processes.splice(i, 1);
+          proccesManager.removeProccesFromArray(
+            proccesManager.processes[j].pid
+          );
+          console.log(
+            `proccess with pid: ${proccesManager.processes[j].pid} terminated`
+          );
         }
       }
     });
     proccesManager.processes[i].on("exit", (code, signal) => {
-      proccesManager.processes = [];
-
-      console.log("starting new proccess...");
-      setTimeout(() => {
-        loopProcesses();
-      }, 500);
+      if (i === proccesManager.processes.length - 1) {
+        setTimeout(() => {
+          loopProcesses();
+        }, 500);
+      }
     });
   }
 };
