@@ -1,30 +1,53 @@
 import { fork } from "node:child_process";
 const files = ["./api/server.js", "./src/monitor.js"];
 const mainPid = process.pid;
-let processes = [];
+
+const manageProccess = () => {
+  let processes = [];
+
+  const updateListProccesses = (procces) => {
+    processes.push(procces);
+  };
+
+  const countProccesses = () => {
+    return processes.length;
+  };
+
+  return {
+    updateListProccesses,
+    countProccesses,
+    processes,
+  };
+};
 
 const loopProcesses = () => {
-  console.log(processes.length);
+  const proccesManager = manageProccess();
+
   for (let i = 0; i < files.length; i++) {
     const process = fork(files[i]);
-    processes.push(process);
+    proccesManager.updateListProccesses(process);
   }
 
-  for (let i = 0; i < processes.length; i++) {
-    processes[i].on("spawn", () => {
-      console.log(`proccess ${i} with pid: ${processes[i].pid} initialized`);
+  for (let i = 0; i < proccesManager.processes.length; i++) {
+    proccesManager.processes[i].on("spawn", () => {
+      console.log(
+        `proccess ${i} with pid: ${proccesManager.processes[i].pid} initialized`
+      );
     });
-    processes[i].on("message", (message) => {
+    proccesManager.processes[i].on("message", (message) => {
       if (message?.event) {
-        for (let j = 0; j < processes.length; j++) {
-          console.log(`killing proccess with pid: ${processes[j].pid}...`);
-          processes[j].kill();
-          processes.splice(i, 1);
+        for (let j = 0; j < proccesManager.processes.length; j++) {
+          console.log(
+            `killing proccess with pid: ${proccesManager.processes[j].pid}...`
+          );
+          proccesManager.processes[j].kill();
+          proccesManager.processes.splice(i, 1);
         }
       }
     });
-    processes[i].on("exit", (code, signal) => {
-      processes = [];
+    proccesManager.processes[i].on("exit", (code, signal) => {
+      proccesManager.processes = [];
+
       console.log("starting new proccess...");
       setTimeout(() => {
         loopProcesses();
@@ -34,12 +57,3 @@ const loopProcesses = () => {
 };
 
 loopProcesses();
-
-// process.on("exit", (code) => {
-//   console.log(process.argv);
-//   spawn(process.argv.shift(), process.argv, {
-//     cwd: process.cwd(),
-//     detached: true,
-//     stdio: "inherit",
-//   });
-// });
