@@ -14,11 +14,10 @@ const loopProcesses = () => {
 
   for (let i = 0; i < proccesManager.processes.length; i++) {
     proccesManager.processes[i].on("spawn", () => {
-      loggerr.log("blue", "teste");
-      // console.log(
-      //   "\x1b[31m",
-      //   `proccess ${i} with pid: ${proccesManager.processes[i].pid} initialized`
-      // );
+      loggerr.log(
+        "green",
+        `proccess ${i} with pid: ${proccesManager.processes[i].pid} initialized`
+      );
     });
     proccesManager.processes[i].on("message", (message) => {
       if (message && message?.event === "change") {
@@ -35,6 +34,7 @@ const loopProcesses = () => {
           console.log(
             `proccess with pid: ${proccesManager.processes[j].pid} terminated`
           );
+          // logger.log
         }
       }
     });

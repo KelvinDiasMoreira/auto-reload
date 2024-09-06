@@ -2,14 +2,14 @@ const logger = () => {
   const defaultColor = "\x1b[0m";
 
   const colors = {
-    black: "\x1b[30m", //Black
-    red: "\x1b[31m", //Red
-    green: "\x1b[32m", //Green
-    yellow: "\x1b[33m", //Yellow
-    blue: "\x1b[34m", //Blue
-    magenta: "\x1b[35m", //Magenta
-    cyan: "\x1b[36m", //Cyan
-    white: "\x1b[37m", //White
+    black: "\x1b[30m",
+    red: "\x1b[31m",
+    green: "\x1b[32m",
+    yellow: "\x1b[33m",
+    blue: "\x1b[34m",
+    magenta: "\x1b[35m",
+    cyan: "\x1b[36m",
+    white: "\x1b[37m",
   };
 
   /**
@@ -23,8 +23,18 @@ const logger = () => {
   const proxyLog = new Proxy(log, {
     apply(target, thisArg, argArray) {
       const [color, message] = argArray;
+      let colorReturned = "";
+
+      for (let i = 0; i < Object.keys(colors).length; i++) {
+        if (color === Object.keys(colors)[i]) {
+          colorReturned = Object.keys(colors)[i];
+          break;
+        }
+        colorReturned = "white";
+      }
+
       return Reflect.apply(target, thisArg, [
-        colors[color] ?? "white",
+        colorReturned,
         message ?? "not message found",
       ]);
     },
