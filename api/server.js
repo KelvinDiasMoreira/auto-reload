@@ -1,6 +1,5 @@
 import { createServer } from "http";
 import { readFile } from "fs";
-
 const hostName = "127.0.0.1";
 const port = 3000;
 

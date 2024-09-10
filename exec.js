@@ -5,7 +5,7 @@ const files = ["./api/server.js", "./src/monitor.js"];
 
 const loopProcesses = () => {
   const proccesManager = manageProccess();
-  const loggerr = logger();
+  const log = logger();
 
   for (let i = 0; i < files.length; i++) {
     const process = fork(files[i]);
@@ -14,10 +14,11 @@ const loopProcesses = () => {
 
   for (let i = 0; i < proccesManager.processes.length; i++) {
     proccesManager.processes[i].on("spawn", () => {
-      loggerr.log(
-        "green",
+      log.success(
         `proccess ${i} with pid: ${proccesManager.processes[i].pid} initialized`
       );
+
+      proccesManager.processes[i].send(`proccess${i} initialized`);
     });
     proccesManager.processes[i].on("message", (message) => {
       if (message && message?.event === "change") {
@@ -31,10 +32,10 @@ const loopProcesses = () => {
           proccesManager.removeProccesFromArray(
             proccesManager.processes[j].pid
           );
-          console.log(
+
+          log.error(
             `proccess with pid: ${proccesManager.processes[j].pid} terminated`
           );
-          // logger.log
         }
       }
     });

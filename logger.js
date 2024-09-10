@@ -16,11 +16,11 @@ const logger = () => {
    * @param {keyof colors} color
    * @param {*} message
    */
-  const log = (color, message) => {
+  const customLog = (color, message) => {
     console.log(colors[color], message, defaultColor);
   };
 
-  const proxyLog = new Proxy(log, {
+  const proxyLog = new Proxy(customLog, {
     apply(target, thisArg, argArray) {
       const [color, message] = argArray;
       let colorReturned = "";
@@ -53,7 +53,7 @@ const logger = () => {
   };
 
   return {
-    log: proxyLog,
+    customLog: proxyLog,
     warn,
     success,
     error,
