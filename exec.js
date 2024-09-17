@@ -43,7 +43,7 @@ const loopProcesses = () => {
       if (i === proccesManager.processes.length - 1) {
         setTimeout(() => {
           loopProcesses();
-        }, 500);
+        }, 1000);
       }
     });
   }

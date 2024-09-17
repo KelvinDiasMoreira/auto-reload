@@ -1,9 +1,10 @@
 import { createServer } from "http";
 import { readFile } from "fs";
+import { socketManager } from "../webSocket/webSocket.js";
 const hostName = "127.0.0.1";
 const port = 3000;
 
-const server = createServer((req, res) => {
+const httpServer = createServer((req, res) => {
   if (req.url === "/") {
     readFile("./index.html", (err, content) => {
       if (err) {
@@ -27,7 +28,9 @@ const server = createServer((req, res) => {
   }
 });
 
-server.listen(port, hostName, () => {
+socketManager(httpServer);
+
+httpServer.listen(port, hostName, () => {
   console.log(`server listen in http://${hostName}:${port}/`);
 });
 
